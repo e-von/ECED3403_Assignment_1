@@ -1,0 +1,159 @@
+
+--------------    Input Records    --------------
+
+------Record 1------: ;
+
+------Record 2------: ; MSP430 Comprehensive Test
+
+------Record 3------: ; This is a test which makes use of code that could be encountered in realistic
+
+------Record 4------: ; assembly usage. No errors should occur and a valid s-record should be emitted.
+
+------Record 5------: ; A mix of directives, instructions and addressing modes are tested.
+
+------Record 6------: ; Some code in this test was based on online materials.
+
+------Record 7------: ;
+
+------Record 8------: 
+
+------Record 9------: COUNT equ 2000
+
+------Record 10------:       bss 2
+
+------Record 11------: PIN3  equ 65500       ; No reason for this. Declating the lacking a physical pin
+
+------Record 12------: PIN4  equ 65501           ; Same as above. Just a declaration for use later
+
+------Record 13------: 
+
+------Record 14------: mov.w #0x0280, SP         ; Initializing a Stack Pointer, alias for R2
+
+------Record 15------: bis.b #0x01, &PIN3        ; OR 0000 00001 with pin 3
+
+------Record 16------: bis.b #$20, &PIN4         ; OR 0010 0000  with pin 4
+
+------Record 17------: 
+
+------Record 18------: LOOP  xor.b   #1, &PIN4   ; XOR 1 with pin 4, start of loop
+
+------Record 19------:       mov.w   #5000, R15  ; mov 5000 to R15, to introduce a delay followingly
+
+------Record 20------: L1    sub     #1, R15     ; decrement R15 by 1
+
+------Record 21------:       jnz L1              ; jump to L1 if negative
+
+------Record 22------:       jmp LOOP            ; else jump to LOOP
+
+------Record 23------: 
+
+------Record 24------: L2    mov     3000, R14   ; The commands below are similar to loop above
+
+------Record 25------:       cmp     COUNT, R14
+
+------Record 26------: L3    sub     #50, R14
+
+------Record 27------:       jnz     L3
+
+------Record 28------:       jmp     L4
+
+------Record 29------: 
+
+------Record 30------: L4    ascii   "The end."
+
+------Record 31------:       end
+
+--------------    Symbol Table    --------------
+Name: L4		Value: 46		Type: Label
+Name: L3		Value: 38		Type: Label
+Name: L2		Value: 30		Type: Label
+Name: L1		Value: 24		Type: Label
+Name: LOOP		Value: 16		Type: Label
+Name: PIN4		Value: 65501		Type: Label
+Name: PIN3		Value: 65500		Type: Label
+Name: COUNT		Value: 2000		Type: Label
+Name: R15		Value: 15		Type: Register
+Name: R14		Value: 14		Type: Register
+Name: R13		Value: 13		Type: Register
+Name: R12		Value: 12		Type: Register
+Name: R11		Value: 11		Type: Register
+Name: R10		Value: 10		Type: Register
+Name: R9		Value: 9		Type: Register
+Name: R8		Value: 8		Type: Register
+Name: R7		Value: 7		Type: Register
+Name: R6		Value: 6		Type: Register
+Name: R5		Value: 5		Type: Register
+Name: R4		Value: 4		Type: Register
+Name: R3		Value: 3		Type: Register
+Name: SR		Value: 2		Type: Register
+Name: R2		Value: 2		Type: Register
+Name: SP		Value: 1		Type: Register
+Name: R1		Value: 1		Type: Register
+Name: PC		Value: 0		Type: Register
+Name: R0		Value: 0		Type: Register
+
+--------------Second Pass Diagnostic Opcode--------------
+Notes: This file contains the record number and corresponding opcode. The opcode
+is categorized into instruction opcode, and source and destination operand values.
+A value of 0000 means non-existing value
+
+----------RECORD: 10----------
+
+----------RECORD: 14----------
+Instruction Opcode: 4031
+Source Value: 0280
+Destination Value: 0000
+
+----------RECORD: 15----------
+Instruction Opcode: d3d2
+Source Value: 0000
+Destination Value: ffdc
+
+----------RECORD: 16----------
+Instruction Opcode: d0f2
+Source Value: 0020
+Destination Value: ffdd
+
+----------RECORD: 18----------
+Instruction Opcode: e3d2
+Source Value: 0000
+Destination Value: ffdd
+
+----------RECORD: 19----------
+Instruction Opcode: 403f
+Source Value: 1388
+Destination Value: 0000
+
+----------RECORD: 20----------
+Instruction Opcode: 831f
+Source Value: 0000
+Destination Value: 0000
+
+----------RECORD: 21----------
+Instruction Opcode: 23ff
+
+----------RECORD: 22----------
+Instruction Opcode: 3ffa
+
+----------RECORD: 24----------
+Instruction Opcode: 401e
+Source Value: 0bb8
+Destination Value: 0000
+
+----------RECORD: 25----------
+Instruction Opcode: 901e
+Source Value: 07d0
+Destination Value: 0000
+
+----------RECORD: 26----------
+Instruction Opcode: 803e
+Source Value: 0032
+Destination Value: 0000
+
+----------RECORD: 27----------
+Instruction Opcode: 23fe
+
+----------RECORD: 28----------
+Instruction Opcode: 3fea
+
+----------RECORD: 30----------
