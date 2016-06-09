@@ -10,13 +10,13 @@
   Latest Updates: None
 */
 
-
-#define LINE_LEN  256
-#define NUL       '\0'
-#define TRUE        1
-#define FALSE       0
-#define HEXADECIMAL 1
-#define DECIMAL     0
+#define LINE_LEN      256
+#define NUL           '\0'
+#define TRUE          1
+#define FALSE         0
+#define EXIT_FAIL  70000
+#define HEXADECIMAL   1
+#define DECIMAL       0
 
 extern FILE* fout;
 

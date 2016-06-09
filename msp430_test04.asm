@@ -28,6 +28,6 @@ stack bss -1111     ; Invalid negative bss
 swpb  label0          ; LC = 65530 + 4
 mov   label0, label1  ; Cannot increment LC, will store the new one for diagnostics
 and   label1, label2  ; Cannot increment LC
-add   &data1, label1  ; No limitations on values in numericals, LC not incremented
+add   &data1, label1  ; LC not incremented
 
 end -100000         ; There should be no limitations on the end address

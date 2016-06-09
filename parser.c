@@ -187,7 +187,10 @@ void analyzelabel(char* line, char* token){
     printf("SOLO LABEL >>%s<<\n", token);
     #endif
     if(!get_entry(token)){            // If label unique, add it with LC
-      add_entry(token, LC, UNKTYPE);
+      add_entry(token, LC, LBLTYPE);
+    }
+    else{
+      update_entry(token, LC, LBLTYPE);
     }
   }
 
@@ -240,7 +243,7 @@ unsigned char is_label(char* token){
 int is_number(char* line){
   char* source;
   char* token;
-  int res = FALSE;
+  int res = EXIT_FAIL;
   unsigned char flag_negative = FALSE;
 
   if(!line){
@@ -274,9 +277,9 @@ int is_number(char* line){
     if (source[1] == 'x' || source[1] == 'X') {
       if(cyclenumber(source, HEXADECIMAL)){
         res = strtol(source, NULL, 16);
+        break;
       }
     }
-    break;
     case '1':
     case '2':
     case '3':
@@ -297,10 +300,10 @@ int is_number(char* line){
     break;
   }
 
-  if(flag_negative){
+  if(flag_negative && res != EXIT_FAIL){
     res = -res;         // return the number as a negative
   }
-
+  printf("is_number returning %d\n", res);
   return res;
 }
 

@@ -132,7 +132,7 @@ void srec_gen(unsigned short datum, unsigned short location, unsigned char bw){
     */
     if(buff_space == 0){
       emit_srec();
-      start_srec(location);
+      start_srec(location + 1);
     }
   }
 
@@ -144,10 +144,10 @@ void srec_gen(unsigned short datum, unsigned short location, unsigned char bw){
   if(buff_space == 0){
       emit_srec();
       if(bw == WORDSIZE){
-        start_srec(location + 1);  //Use the following location after the first
-      }                            //byte.
+        start_srec(location + 2);  //Use lc +2 since we used the 1st for HIGHBYTE
+      }
       else{
-        start_srec(location);      //Else use the usual location
+        start_srec(location + 1); //Use next location Otherwise
       }
   }
   return;

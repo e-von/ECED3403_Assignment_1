@@ -140,7 +140,8 @@ void bss(char* record, unsigned char mode){
     return;
   }
 
-  if(bsval = is_number(record)){  // Check if bss equated to valid number
+  // Check if bss equated to valid number
+  if((bsval = is_number(record)) != EXIT_FAIL){
     if(bsval < MAX_LC && bsval > 0){
       add_bss_record(bsval);
       adjustLC(bsval, INCREMENT);
@@ -188,8 +189,10 @@ void byte(char* record){
     return;
   }
 
-  byteval = is_number(record);
-  printf("BYTEVAL IS %d\n", byteval);
+  if((byteval = is_number(record)) == EXIT_FAIL){
+    error_count("ERROR: Byte not Equated to a Numeric Value", record);
+    return;
+  }
 
   if(byteval <= MAXBYTEVAL && byteval > 0){ //Check if byte val is indeed a byte
     if(flag_first_token_label){             //Add label if there is one
@@ -210,6 +213,7 @@ void byte(char* record){
 
 void end(char* value){
   struct symbol_entry* temp;
+  int address;
 
   if(flag_first_token_label){
     error_count("ERROR: End directive cannot have a label:", global);
@@ -223,8 +227,8 @@ void end(char* value){
     if(temp = get_entry(value)){    //If there is one, add it to global storage
       start_address = temp->value;  //for s9 record
     }
-    else{
-      start_address = is_number(value);
+    else if((address = is_number(value)) != EXIT_FAIL){
+      start_address = address;
     }
   }
   else{
@@ -249,7 +253,7 @@ void equ(char* value){
 
   if(entry = get_entry(global)){
     if(entry->type != REGTYPE){
-      if(intval = is_number(value)){
+      if((intval = is_number(value)) != EXIT_FAIL){
         update_entry(global, intval, LBLTYPE);
       }
       else{
@@ -262,7 +266,7 @@ void equ(char* value){
   }
 
   // At this point we know label validity, so we just add the entry to the table
-  else if(intval = is_number(value)){
+  else if((intval = is_number(value)) != EXIT_FAIL){
     add_entry(global, intval, LBLTYPE);
   }
   else{
@@ -294,7 +298,7 @@ void origin(char* record){
     add_org_record(entry->value);
     adjustLC(entry->value, EQUATE);
   }
-  else if(value = is_number(record)){
+  else if((value = is_number(record)) != EXIT_FAIL){
     #ifdef debug
     printf("ORIGIN with a NUMBER\n");
     #endif
@@ -354,7 +358,7 @@ void word(char* record){
   struct symbol_entry* entry;
   int wordval;
 
-  if(wordval = is_number(record)){
+  if((wordval = is_number(record)) != EXIT_FAIL){
     if(wordval <= MAXWORDVAL && wordval >= 0){
       add_data_record(wordval, WORD); // Add entry to second pass linked-list
     }

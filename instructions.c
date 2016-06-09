@@ -459,7 +459,7 @@ void checkindirect(char* operand, enum ADDR_MODE* mode){
 
 void checkimmediate(char* operand, enum ADDR_MODE* mode){
   struct symbol_entry* symbl;
-  short temp;
+  int temp;
 
   flag_const_immediate = FALSE;
   *operand++;
@@ -474,6 +474,9 @@ void checkimmediate(char* operand, enum ADDR_MODE* mode){
         printf("OPERAND >>%s<< IMMEDIATE EXISTING LABEL\n", operand);
         #endif
         *mode = IMMEDIATE;
+        if(CONGEN(symbl->value)){
+          flag_const_immediate = TRUE;
+        }
       }
       else{
         error_count("ERROR: Operand cannot be a Register in Immediate"
@@ -489,7 +492,7 @@ void checkimmediate(char* operand, enum ADDR_MODE* mode){
       *mode = IMMEDIATE;
     }
   }
-  else if(temp = is_number(operand)){
+  else if((temp = is_number(operand)) != EXIT_FAIL){
     #ifdef debug
     printf("OPERAND >>%s<< IMMEDIATE NUMERICAL\n", operand);
     #endif
@@ -590,6 +593,7 @@ void checkdefault(char* operand, enum ADDR_MODE* mode){
         }
       }
       else{
+        flag_valid_base = TRUE;
         #ifdef debug
         printf("BASE ADDRESS >>%s<< UNKNOWN VALID\n", baseaddress);
         #endif /* debug */
@@ -609,7 +613,7 @@ void checkdefault(char* operand, enum ADDR_MODE* mode){
     }
   }   /* Ended searching for Indexed*/
 
-  else if(is_number(operand)){
+  else if((is_number(operand)) != EXIT_FAIL){
     #ifdef debug
     printf("OPERAND >>%s<< NUMERIC RELATIVE\n", operand);
     #endif
@@ -624,7 +628,7 @@ void checkdefault(char* operand, enum ADDR_MODE* mode){
 
 void checkjump(char* line, char* jumpinst){
   char* token;
-  unsigned short value;
+  int value;
   token = strtok(line, " \t\r\n");
 
   if(token == NULL){
@@ -641,7 +645,8 @@ void checkjump(char* line, char* jumpinst){
     add_jump_record(jumpinst, JUMP, token);
     (LC + WORD_INC) <= MAX_LC ? LC+=WORD_INC : (flag_max_lc = TRUE);
   }
-  else if(value = is_number(line)){
+  else if((value = is_number(line)) != EXIT_FAIL){
+    printf("RETURNED value %d\n", value);
     printf("%s is a numerical jump\n", token);
     // Adds the operand and instruction to the record list for the second pass
     add_jump_record(jumpinst, JUMP, token);

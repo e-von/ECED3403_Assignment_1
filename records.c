@@ -5,7 +5,7 @@
 
   Coder: Elias Vonapartis
   Release Date: May 28, 2016
-  Latest Updates: None
+  Latest Updates: June 8, 2016  - Added jump forward reference support
 */
 
 #include <stdio.h>
@@ -76,7 +76,17 @@ void add_jump_record(char* inst, enum INST_TYPE type, char* offset){
 
   (tmp = get_entry(offset)) ? (off = tmp->value) : (off = is_number(offset));
 
-  newentry = new_entry(inst, type, NULL, NULL, -1, -1, off, NULL, -1, -1);
+  if(tmp){
+    if(tmp->type == UNKTYPE){
+      newentry = new_entry(inst, type, offset, NULL, -1, -1, off, NULL, -1, -1);
+    }
+    else{
+      newentry = new_entry(inst, type, NULL, NULL, -1, -1, off, NULL, -1, -1);
+    }
+  }
+  else{
+    newentry = new_entry(inst, type, NULL, NULL, -1, -1, off, NULL, -1, -1);
+  }
   double_linking(newentry, temp);
 }
 

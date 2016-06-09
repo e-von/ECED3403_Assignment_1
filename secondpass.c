@@ -8,6 +8,9 @@
   Coder: Elias Vonapartis
   Release Date: May 28, 2016
   Latest Updates: May 31, 2016  - Fixed invalid odd calculation of jump offset
+                  June 8, 2016  - Fixed Relative, Indexed dist calculation
+                                - Fixed Immediate constant with label
+                                - Added jump forward reference support
 */
 
 #include <stdio.h>
@@ -21,6 +24,7 @@
 #include "symboltable.h"
 #include "emit.h"
 #include "srec_gen.h"
+#include "records.h"
 
 unsigned as_value[] = {0, 1, 1, 1, 2, 3, 3};
 unsigned ad_value[] = {0, 1, 1, 1};
@@ -130,9 +134,8 @@ void type1_inst(struct record_entry* singleinst){
   unsigned short inst_out;
 
   instptr = get_inst(singleinst->inst);
-  //as = as_value[singleinst->src_mode]; // This now is assigned to numval
   reg = reg_value[singleinst->src_mode];
-  numval_extractor(singleinst->src_mode, singleinst->src_op, &val, &reg, &as);
+  numval_extractor(singleinst->src_mode, singleinst->src_op, &val, &reg, &as, singleinst->LC);
   inst_out = emit_single(reg, as, instptr->bw, instptr->opcode);
   srec_gen(inst_out, singleinst->LC, WORDSIZE);
 
@@ -174,21 +177,26 @@ void type2_inst(struct record_entry* doubleinst){
   unsigned short inst_out;
 
   instptr = get_inst(doubleinst->inst);
-  //as = as_value[doubleinst->src_mode]; // This now is assigned to numval
+  // as needed to be assigned to numval_extractor because of const gen
   ad = ad_value[doubleinst->dst_mode];
   sreg = reg_value[doubleinst->src_mode];
   dreg = reg_value[doubleinst->dst_mode];
-  numval_extractor(doubleinst->src_mode, doubleinst->src_op, &val0, &sreg, &as);
-  numval_extractor(doubleinst->dst_mode, doubleinst->dst_op, &val1, &dreg, &junk);
+  numval_extractor(doubleinst->src_mode, doubleinst->src_op, &val0, &sreg, &as, doubleinst->LC);
+  numval_extractor(doubleinst->dst_mode, doubleinst->dst_op, &val1, &dreg, &junk, doubleinst->LC);
   inst_out = emit_double(dreg, as, instptr->bw, ad, sreg, instptr->opcode);
   srec_gen(inst_out, doubleinst->LC, WORDSIZE);
 
   if(val0){
     printf("We have a val0 %d\n", val0);
     srec_gen(val0, (doubleinst->LC + WORDINC), WORDSIZE);
+    printf("We use for val0 an lc of %d\n", doubleinst->LC + WORDINC);
   }
-  if(val1){
+  if(val1){ // Meaning Indexed, Relative or Absolute
     printf("We have a val1 %d\n", val1);
+    if(val0 && (doubleinst->dst_mode != ABSOLUTE)){ // So dst either idx, rel
+      val1 -= WORDINC;  // decrement the signed distance
+      printf("New val1 for idx rel %d\n", val1);
+    }
     srec_gen(val1, (doubleinst->LC + DOUBLEWORDINC), WORDSIZE);
   }
 
@@ -221,15 +229,23 @@ void type2_inst(struct record_entry* doubleinst){
 void type3_inst(struct record_entry* jumpinst){
   struct inst_el *instptr;
   struct double_op inst;
+  struct symbol_entry* symbol;
   unsigned short offset;
   short distance;
   short halfdist;
   unsigned short inst_out;
 
   instptr = get_inst(jumpinst->inst);
-  offset = jumpinst->offset;
+  if(jumpinst->src_op){                   // Indicative of a forward reference
+    symbol = get_entry(jumpinst->src_op);
+    offset = symbol->value;
+  }
+  else{
+    offset = jumpinst->offset;
+  }
+
   printf("Offset is: %d\n", offset);
-  distance = offset - jumpinst->LC;
+  distance = offset - (jumpinst->LC + WORDINC);
   printf("jumpinst->LC is %d\n", jumpinst->LC);
   halfdist = half_value(distance);
 
@@ -267,7 +283,7 @@ void type3_inst(struct record_entry* jumpinst){
   addition to handle cases in which immdiate constants were being used.
 */
 void numval_extractor(enum ADDR_MODE mode, char* src, int* value,
-                      unsigned char* reg, unsigned char* as){
+                      unsigned char* reg, unsigned char* as, int lc){
   char* temp = src;
   char* index;
   char* baseaddress;
@@ -279,19 +295,18 @@ void numval_extractor(enum ADDR_MODE mode, char* src, int* value,
     case INDIRECT:
     case INDIRECT_INCR:
     /* Not searching for the +, it does not get passed by the first pass */
-    *temp++;
+    *temp++; // Remove the @
     case REGISTER:
-    if(mode == REGISTER){
-      if(symbol = get_entry(temp)){  //In the case the coder is using an alias
-        *reg = symbol->value;
-        *as = as_value[mode];
-        break;
-      }
+    if(symbol = get_entry(temp)){  // In the case the coder is using an alias
+      *reg = symbol->value;        // such as sp, pc
+      *as = as_value[mode];
+      break;
     }
-    *temp++;
-    *reg = is_number(temp);
-    *as = as_value[mode];
+    *temp++;                         // Remove the R
+    *reg = is_number(temp);          // Retrieve register value
+    *as = as_value[mode];            // Set as
     #ifdef debug2
+    printf("R, @R, @R+\n");
     printf("*as is %d\n", *as);
     printf("*reg is %d\n", *reg);
     #endif
@@ -299,16 +314,21 @@ void numval_extractor(enum ADDR_MODE mode, char* src, int* value,
     case IMMEDIATE:
     *reg = PC_REG;
     *temp++;
-    *value = is_number(temp);
+    if(symbol = get_entry(temp)){    // Immediate can be used wth symbols
+      *value = symbol->value;
+    }
+    else{
+      *value = is_number(temp);      // Else it's a numeric
+    }
     *as = as_value[mode];
-    if(CONGEN(*value)){
+    if(CONGEN(*value)){              // Check if values retrieved are consts
       switch (*value) {
         case 0:
         case 1:
         case 2:
-        *as = as_consts[*value];
+        *as = as_consts[*value];     // Common AS for 0, 1, 2
         case -1:
-        *reg = CG_REG;  //In constant generator cases use R3
+        *reg = CG_REG;  // In -1, 0, 1, 2 cases use R3 for register
         if(*value == -1){
           *as = as_value[mode];
         }
@@ -334,15 +354,29 @@ void numval_extractor(enum ADDR_MODE mode, char* src, int* value,
     case ABSOLUTE:
     *reg = SR_REG;
     *temp++;
-    case RELATIVE:
-    if(mode != ABSOLUTE){
-      *reg = PC_REG;
-    }
     if(symbol = get_entry(temp)){
-      *value = symbol->value;
+      *value = (symbol->value);
     }
     else{
       *value = is_number(temp);
+    }
+    *as = as_value[mode];
+    break;
+    case RELATIVE:
+    *reg = PC_REG;
+    if(symbol = get_entry(temp)){
+      *value = (symbol->value) - (lc + WORDINC);
+      #ifdef debug2
+      printf("lc used was %d\n", lc);
+      printf("Found LC diff %d\n", *value);
+      #endif
+    }
+    else{
+      *value = is_number(temp) - (lc + WORDINC);
+      #ifdef debug2
+      printf("lc used was %d\n", lc);
+      printf("Found LC diff2 %d\n", *value);
+      #endif
     }
     *as = as_value[mode];
     break;
@@ -358,7 +392,10 @@ void numval_extractor(enum ADDR_MODE mode, char* src, int* value,
     }
     symbol = get_entry(index);
     *reg = symbol->value;
+
+    #ifdef debug2
     printf("Index Register is: %d\n", *reg);
+    #endif
 
     /* Now to find the base address */
     i = 0; // Reset the counter
@@ -368,9 +405,11 @@ void numval_extractor(enum ADDR_MODE mode, char* src, int* value,
       i++;                        // No need to break at MAX_NAME_LEN since
     }                             // is_label checks
     symbol = get_entry(baseaddress);
-    *value = symbol->value;
+    *value = (symbol->value) - (lc + WORDINC);
     *as = as_value[mode];
+    #ifdef debug2
     printf("Base Address Value %d\n", *value);
+    #endif
     break;
   }
 }
