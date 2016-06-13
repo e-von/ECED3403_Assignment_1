@@ -17,7 +17,7 @@ struct record_entry* new_entry(char* inst, enum INST_TYPE type, char* src_op,
             char* dst_op, enum ADDR_MODE src_mode, enum ADDR_MODE dst_mode,
             unsigned short offset, char* string, int value, unsigned char wbosb){
 
-	struct record_entry* newentry;
+  struct record_entry* newentry;
   newentry = malloc(sizeof(struct record_entry));
 
   newentry->line = line_number;
@@ -33,9 +33,9 @@ struct record_entry* new_entry(char* inst, enum INST_TYPE type, char* src_op,
   newentry->value = value;
   newentry->wbosb = wbosb;
 
-	newentry->prev = NULL;
-	newentry->next = NULL;
-	return newentry;
+  newentry->prev = NULL;
+  newentry->next = NULL;
+  return newentry;
 }
 
 /*

@@ -181,8 +181,10 @@ void type2_inst(struct record_entry* doubleinst){
   ad = ad_value[doubleinst->dst_mode];
   sreg = reg_value[doubleinst->src_mode];
   dreg = reg_value[doubleinst->dst_mode];
-  numval_extractor(doubleinst->src_mode, doubleinst->src_op, &val0, &sreg, &as, doubleinst->LC);
-  numval_extractor(doubleinst->dst_mode, doubleinst->dst_op, &val1, &dreg, &junk, doubleinst->LC);
+  numval_extractor(doubleinst->src_mode, doubleinst->src_op, &val0, &sreg, &as,
+		   doubleinst->LC);
+  numval_extractor(doubleinst->dst_mode, doubleinst->dst_op, &val1, &dreg, &junk,
+		   doubleinst->LC);
   inst_out = emit_double(dreg, as, instptr->bw, ad, sreg, instptr->opcode);
   srec_gen(inst_out, doubleinst->LC, WORDSIZE);
 

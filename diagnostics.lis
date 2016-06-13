@@ -1,45 +1,43 @@
 
 --------------    Input Records    --------------
 
-------Record 1------: ORG     $1010
+------Record 1------: ;
 
-------Record 2------: Start
+------Record 2------: ; MSP-430 assembler code example
 
-------Record 3------: jc      Loop    ;forward label jump
+------Record 3------: ; ECED 3403
 
-------Record 4------: ;jeq     $1006   ;backwards hex jump
+------Record 4------: ; 5 May 2016
 
-------Record 5------: ;jge     $1050   ;forwards hex jump
+------Record 5------: ;
 
-------Record 6------: jhs     Loop
+------Record 6------: 
 
-------Record 7------: jl      Start   ;backwards label jump
+------Record 7------: ORG		0x1000
 
-------Record 8------: ; jlo     4096    ;backwards decimal jump
+------Record 8------: 			MOV		#1,R4    			; R4 = 1
 
-------Record 9------: jmp     Loop
+------Record 9------: 			SWPB	R4      			; Swap bytes
 
-------Record 10------: jn      Start
+------Record 10------: Loop	add		@R7,Data(R5)	; Data[R5] = Data[R5] + [R7]
 
-------Record 11------: ; jnc     $1008
+------Record 11------: 			ADD		Data(R5),R4		; R4 = R4 + Data[R5]
 
-------Record 12------: jne     Loop
+------Record 12------: 			ADDC	#1,R5					; R5 = R5 +1 + C
 
-------Record 13------: jnz     Start
+------Record 13------: ;
 
-------Record 14------: ;  jz      6000    ;forwards decimal jump
+------Record 14------: org		0x2000
 
-------Record 15------: 
+------Record 15------: Data	bss		4       			; 4 bytes associated with Data
 
-------Record 16------: ORG     $1020
+------Record 16------: ;
 
-------Record 17------: Loop
-
-------Record 18------: ;
+------Record 17------: 			END 0x1000
 
 --------------    Symbol Table    --------------
-Name: Loop		Value: 4128		Type: Label
-Name: Start		Value: 4112		Type: Label
+Name: Data		Value: 8192		Type: Label
+Name: Loop		Value: 4100		Type: Label
 Name: R15		Value: 15		Type: Register
 Name: R14		Value: 14		Type: Register
 Name: R13		Value: 13		Type: Register
@@ -65,27 +63,31 @@ Notes: This file contains the record number and corresponding opcode. The opcode
 is categorized into instruction opcode, and source and destination operand values.
 A value of 0000 means non-existing value
 
-----------RECORD: 1----------
-
-----------RECORD: 3----------
-Instruction Opcode: 2c07
-
-----------RECORD: 6----------
-Instruction Opcode: 2c06
-
 ----------RECORD: 7----------
-Instruction Opcode: 3bfd
+
+----------RECORD: 8----------
+Instruction Opcode: 4314
+Source Value: 0000
+Destination Value: 0000
 
 ----------RECORD: 9----------
-Instruction Opcode: 3c04
-
+Instruction Opcode: 1084
+Source Value: 0000
 ----------RECORD: 10----------
-Instruction Opcode: 33fb
+Instruction Opcode: 57a5
+Source Value: 0000
+Destination Value: 0ffa
+
+----------RECORD: 11----------
+Instruction Opcode: 5514
+Source Value: 0ff6
+Destination Value: 0000
 
 ----------RECORD: 12----------
-Instruction Opcode: 2002
+Instruction Opcode: 6315
+Source Value: 0000
+Destination Value: 0000
 
-----------RECORD: 13----------
-Instruction Opcode: 23f9
+----------RECORD: 14----------
 
-----------RECORD: 16----------
+----------RECORD: 15----------

@@ -302,7 +302,7 @@ void operand_parser(char* operand, enum INST_TYPE type, char* inst){
   incrementLC(&src_addr_mode, &dst_addr_mode);
 }
 
-unsigned char tokenize_operands(char* operand, enum INST_TYPE type, char** source,
+unsigned char tokenize_operands(char* operand,enum INST_TYPE type,char** source,
                        char** destination){
   char* token;
   char* src = malloc(sizeof(short));
@@ -328,7 +328,7 @@ unsigned char tokenize_operands(char* operand, enum INST_TYPE type, char** sourc
   }
 
   if(type == DOUBLE){
-    for(i = 0; token[i] != ','; i++){ // Search for comma, characteristic of double
+    for(i = 0; token[i] != ','; i++){ // Search for comma, characteristic of dbl
       if (i == MAX_NAME_LEN){         // Label can't be larger than 32
         error_count("ERROR: Operand too long or no ',' for DoubleOp.", NULL);
         return res;                 // To avoid overflow and infinite looping
@@ -579,10 +579,11 @@ void checkdefault(char* operand, enum ADDR_MODE* mode){
       i++;                        // is_label checks
     }
     printf("Testing BASE ADDRESS >>%s<<\n", baseaddress);
-    if(is_label(baseaddress)){            // Check to see if it follows label structure
+    if(is_label(baseaddress)){            // Check to see if it follows label
       if(symbl = get_entry(baseaddress)){ // Check to see if existing label
         if(symbl->type == REGTYPE){
-          error_count("ERROR: The base address cannot be a register:", baseaddress);
+          error_count("ERROR: The base address cannot be a register:",
+		       baseaddress);
           *mode = BAD_ADDR_MODE;
         }
         else{

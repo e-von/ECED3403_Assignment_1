@@ -117,6 +117,12 @@ void srec_gen(unsigned short datum, unsigned short location, unsigned char bw){
   printf("emitting datum: %04x\n", datum);
 
   low_byte = LOWBYTE(datum);
+  buff_space = write_srec(low_byte);
+  printf("buff_space_byte %d\n", buff_space);
+  if(buff_space == 0){
+    emit_srec();
+    start_srec(location + 1);
+  }
 
   if(bw == WORDSIZE){
     high_byte = HIGHBYTE(datum);
@@ -132,24 +138,10 @@ void srec_gen(unsigned short datum, unsigned short location, unsigned char bw){
     */
     if(buff_space == 0){
       emit_srec();
-      start_srec(location + 1);
+      start_srec(location + 2);
     }
   }
-
-  /*
-    Similar approach here.
-  */
-  buff_space = write_srec(low_byte);
-  printf("buff_space_byte %d\n", buff_space);
-  if(buff_space == 0){
-      emit_srec();
-      if(bw == WORDSIZE){
-        start_srec(location + 2);  //Use lc +2 since we used the 1st for HIGHBYTE
-      }
-      else{
-        start_srec(location + 1); //Use next location Otherwise
-      }
-  }
+  
   return;
 }
 
@@ -174,7 +166,7 @@ void srec_char(char* datum, unsigned short location){
 }
 
 void srec_org(unsigned short address){
-  emit_srec();                      //emits the current s-rec
+  emit_srec();                  //emits the current s-rec
   start_srec(address);          //starts an new one at the address specified
 }
 

@@ -55,7 +55,7 @@ void parse_record(char* line){
   unsigned short safeguard = 0;
   struct firsttoken tokinfo;
 
-  string = storeline(line);        //Store the record for error printing purposes
+  string = storeline(line);      //Store the record for error printing purposes
 
   token = strtok(line, " \t\r\n"); // Isolate the token for analysis
 
