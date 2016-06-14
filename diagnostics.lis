@@ -1,43 +1,19 @@
 
 --------------    Input Records    --------------
 
-------Record 1------: ;
+------Record 1------: org 2000
 
-------Record 2------: ; MSP-430 assembler code example
+------Record 2------: mov label, stack
 
-------Record 3------: ; ECED 3403
+------Record 3------: org 1000
 
-------Record 4------: ; 5 May 2016
+------Record 4------: label bss 4
 
-------Record 5------: ;
-
-------Record 6------: 
-
-------Record 7------: ORG		0x1000
-
-------Record 8------: 			MOV		#1,R4    			; R4 = 1
-
-------Record 9------: 			SWPB	R4      			; Swap bytes
-
-------Record 10------: Loop	add		@R7,Data(R5)	; Data[R5] = Data[R5] + [R7]
-
-------Record 11------: 			ADD		Data(R5),R4		; R4 = R4 + Data[R5]
-
-------Record 12------: 			ADDC	#1,R5					; R5 = R5 +1 + C
-
-------Record 13------: ;
-
-------Record 14------: org		0x2000
-
-------Record 15------: Data	bss		4       			; 4 bytes associated with Data
-
-------Record 16------: ;
-
-------Record 17------: 			END 0x1000
+------Record 5------: stack bss 2
 
 --------------    Symbol Table    --------------
-Name: Data		Value: 8192		Type: Label
-Name: Loop		Value: 4100		Type: Label
+Name: stack		Value: 1004		Type: Label
+Name: label		Value: 1000		Type: Label
 Name: R15		Value: 15		Type: Register
 Name: R14		Value: 14		Type: Register
 Name: R13		Value: 13		Type: Register
@@ -63,31 +39,15 @@ Notes: This file contains the record number and corresponding opcode. The opcode
 is categorized into instruction opcode, and source and destination operand values.
 A value of 0000 means non-existing value
 
-----------RECORD: 7----------
+----------RECORD: 1----------
 
-----------RECORD: 8----------
-Instruction Opcode: 4314
-Source Value: 0000
-Destination Value: 0000
+----------RECORD: 2----------
+Instruction Opcode: 4090
+Source Value: fffffc12
+Destination Value: fffffc14
 
-----------RECORD: 9----------
-Instruction Opcode: 1084
-Source Value: 0000
-----------RECORD: 10----------
-Instruction Opcode: 57a5
-Source Value: 0000
-Destination Value: 0ffa
+----------RECORD: 3----------
 
-----------RECORD: 11----------
-Instruction Opcode: 5514
-Source Value: 0ff6
-Destination Value: 0000
+----------RECORD: 4----------
 
-----------RECORD: 12----------
-Instruction Opcode: 6315
-Source Value: 0000
-Destination Value: 0000
-
-----------RECORD: 14----------
-
-----------RECORD: 15----------
+----------RECORD: 5----------

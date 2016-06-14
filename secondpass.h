@@ -24,6 +24,7 @@
 
 #define WORDINC       2
 #define DOUBLEWORDINC 4
+#define FOURWORDINC   6
 
 #define half_value(x) (x >> 1)
 

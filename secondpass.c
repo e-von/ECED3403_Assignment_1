@@ -11,6 +11,8 @@
                   June 8, 2016  - Fixed Relative, Indexed dist calculation
                                 - Fixed Immediate constant with label
                                 - Added jump forward reference support
+                  June 14, 2016 - Fixed Indexed back to absolute base address
+                                - Fixed Relative calculation
 */
 
 #include <stdio.h>
@@ -177,7 +179,6 @@ void type2_inst(struct record_entry* doubleinst){
   unsigned short inst_out;
 
   instptr = get_inst(doubleinst->inst);
-  // as needed to be assigned to numval_extractor because of const gen
   ad = ad_value[doubleinst->dst_mode];
   sreg = reg_value[doubleinst->src_mode];
   dreg = reg_value[doubleinst->dst_mode];
@@ -190,14 +191,14 @@ void type2_inst(struct record_entry* doubleinst){
 
   if(val0){
     printf("We have a val0 %d\n", val0);
-    srec_gen(val0, (doubleinst->LC + WORDINC), WORDSIZE);
     printf("We use for val0 an lc of %d\n", doubleinst->LC + WORDINC);
+    srec_gen(val0, (doubleinst->LC + WORDINC), WORDSIZE);
   }
   if(val1){ // Meaning Indexed, Relative or Absolute
     printf("We have a val1 %d\n", val1);
-    if(val0 && (doubleinst->dst_mode != ABSOLUTE)){ // So dst either idx, rel
-      val1 -= WORDINC;  // decrement the signed distance
-      printf("New val1 for idx rel %d\n", val1);
+    if(val0 && (doubleinst->dst_mode == RELATIVE)){ // So dst either idx, rel
+      val1 -= WORDINC;  // decrement the signed distance, i.e has higher LC
+      printf("New val1 for rel %d\n", val1);
     }
     srec_gen(val1, (doubleinst->LC + DOUBLEWORDINC), WORDSIZE);
   }
@@ -267,9 +268,10 @@ void type3_inst(struct record_entry* jumpinst){
   else{
     inst_out = emit_jump(halfdist, instptr->opcode);
     srec_gen(inst_out, jumpinst->LC, WORDSIZE);
+    opcode_printer(inst_out, 0, 0, JUMP);
   }
 
-  opcode_printer(inst_out, 0, 0, JUMP);
+
 
   #ifdef debug2
   printf("\nOpcode: %04x\n", instptr->opcode);
@@ -367,14 +369,14 @@ void numval_extractor(enum ADDR_MODE mode, char* src, int* value,
     case RELATIVE:
     *reg = PC_REG;
     if(symbol = get_entry(temp)){
-      *value = (symbol->value) - (lc + WORDINC);
+      *value = (symbol->value) - (lc + FOURWORDINC); //Inst + Operand + PCinc = 6
       #ifdef debug2
       printf("lc used was %d\n", lc);
       printf("Found LC diff %d\n", *value);
       #endif
     }
     else{
-      *value = is_number(temp) - (lc + WORDINC);
+      *value = is_number(temp) - (lc + FOURWORDINC); //Inst + Operand + PCinc = 6
       #ifdef debug2
       printf("lc used was %d\n", lc);
       printf("Found LC diff2 %d\n", *value);
@@ -407,7 +409,7 @@ void numval_extractor(enum ADDR_MODE mode, char* src, int* value,
       i++;                        // No need to break at MAX_NAME_LEN since
     }                             // is_label checks
     symbol = get_entry(baseaddress);
-    *value = (symbol->value) - (lc + WORDINC);
+    *value = (symbol->value);
     *as = as_value[mode];
     #ifdef debug2
     printf("Base Address Value %d\n", *value);
