@@ -369,14 +369,14 @@ void numval_extractor(enum ADDR_MODE mode, char* src, int* value,
     case RELATIVE:
     *reg = PC_REG;
     if(symbol = get_entry(temp)){
-      *value = (symbol->value) - (lc + FOURWORDINC); //Inst + Operand + PCinc = 6
+      *value = (symbol->value) - (lc + DOUBLEWORDINC);
       #ifdef debug2
       printf("lc used was %d\n", lc);
       printf("Found LC diff %d\n", *value);
       #endif
     }
     else{
-      *value = is_number(temp) - (lc + FOURWORDINC); //Inst + Operand + PCinc = 6
+      *value = is_number(temp) - (lc + DOUBLEWORDINC);
       #ifdef debug2
       printf("lc used was %d\n", lc);
       printf("Found LC diff2 %d\n", *value);

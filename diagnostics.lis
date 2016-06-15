@@ -1,19 +1,24 @@
 
 --------------    Input Records    --------------
 
-------Record 1------: org 2000
+------Record 1------: org 1000
 
-------Record 2------: mov label, stack
+------Record 2------: alpha word 1000
 
-------Record 3------: org 1000
+------Record 3------: 
 
-------Record 4------: label bss 4
+------Record 4------: org 2000
 
-------Record 5------: stack bss 2
+------Record 5------: mov #1, alpha
+
+------Record 6------: mov #2, alpha
+
+------Record 7------: mov #3, alpha
+
+------Record 8------: end 2000
 
 --------------    Symbol Table    --------------
-Name: stack		Value: 1004		Type: Label
-Name: label		Value: 1000		Type: Label
+Name: alpha		Value: 1000		Type: Label
 Name: R15		Value: 15		Type: Register
 Name: R14		Value: 14		Type: Register
 Name: R13		Value: 13		Type: Register
@@ -42,12 +47,20 @@ A value of 0000 means non-existing value
 ----------RECORD: 1----------
 
 ----------RECORD: 2----------
-Instruction Opcode: 4090
-Source Value: fffffc12
-Destination Value: fffffc14
-
-----------RECORD: 3----------
 
 ----------RECORD: 4----------
 
 ----------RECORD: 5----------
+Instruction Opcode: 4390
+Source Value: 0000
+Destination Value: fffffc14
+
+----------RECORD: 6----------
+Instruction Opcode: 43a0
+Source Value: 0000
+Destination Value: fffffc10
+
+----------RECORD: 7----------
+Instruction Opcode: 40b0
+Source Value: 0003
+Destination Value: fffffc0a
